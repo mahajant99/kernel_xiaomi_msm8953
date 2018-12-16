@@ -93,7 +93,7 @@ int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms)
 {
 	if (gf_dev == NULL) {
 		pr_info("Input buff is NULL.\n");
-		return -EPERM;
+		return -1;
 	}
 	gpio_direction_output(gf_dev->reset_gpio, 1);
 	gpio_set_value(gf_dev->reset_gpio, 0);
@@ -107,7 +107,7 @@ int gf_irq_num(struct gf_dev *gf_dev)
 {
 	if (gf_dev == NULL) {
 		pr_info("Input buff is NULL.\n");
-		return -EPERM;
+		return -1;
 	} else {
 		return gpio_to_irq(gf_dev->irq_gpio);
 	}
