@@ -20,10 +20,10 @@ enum FP_MODE{
 #define SUPPORT_NAV_EVENT
 
 #if defined(SUPPORT_NAV_EVENT)
-#define GF_NAV_INPUT_UP			198
-#define GF_NAV_INPUT_DOWN		197
-#define GF_NAV_INPUT_LEFT		195
-#define GF_NAV_INPUT_RIGHT		196
+#define GF_NAV_INPUT_UP			KEY_UP
+#define GF_NAV_INPUT_DOWN		KEY_DOWN
+#define GF_NAV_INPUT_LEFT		KEY_LEFT
+#define GF_NAV_INPUT_RIGHT		KEY_RIGHT
 #define GF_NAV_INPUT_CLICK		KEY_VOLUMEDOWN
 #define GF_NAV_INPUT_DOUBLE_CLICK	KEY_VOLUMEUP
 #define GF_NAV_INPUT_LONG_PRESS		KEY_SEARCH
@@ -143,7 +143,7 @@ struct gf_dev {
 	struct work_struct work;
 };
 
-int gf_parse_dts(struct gf_dev* gf_dev);
+int gf_parse_dts(struct gf_dev *gf_dev);
 void gf_cleanup(struct gf_dev *gf_dev);
 
 int gf_power_on(struct gf_dev *gf_dev);
