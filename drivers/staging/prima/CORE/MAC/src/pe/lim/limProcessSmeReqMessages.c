@@ -191,7 +191,7 @@ __limFreshScanReqd(tpAniSirGlobal pMac, tANI_U8 returnFreshResults)
    if( (validState) && (returnFreshResults & SIR_BG_SCAN_RETURN_FRESH_RESULTS))
     return TRUE;
 
-    return FALSE;
+   return FALSE;
 }
 
 
@@ -1685,6 +1685,31 @@ static void __limProcessClearDfsChannelList(tpAniSirGlobal pMac,
                   sizeof(tSirDFSChannelList), 0);
 }
 
+#ifdef WLAN_FEATURE_SAE
+/**
+ * lim_update_sae_config()- This API update SAE session info to csr config
+ * from join request.
+ * @session: PE session
+ * @sme_join_req: pointer to join request
+ *
+ * Return: None
+ */
+static void lim_update_sae_config(tpPESession session,
+                                  tpSirSmeJoinReq sme_join_req)
+{
+    session->sae_pmk_cached = sme_join_req->sae_pmk_cached;
+
+    VOS_TRACE(VOS_MODULE_ID_PE, VOS_TRACE_LEVEL_DEBUG,
+              FL("pmk_cached %d for BSSID=" MAC_ADDRESS_STR),
+              session->sae_pmk_cached,
+              MAC_ADDR_ARRAY(sme_join_req->bssDescription.bssId));
+}
+#else
+static inline void lim_update_sae_config(tpPESession session,
+                                         tpSirSmeJoinReq sme_join_req)
+{}
+#endif
+
 /**
  * __limProcessSmeJoinReq()
  *
@@ -2002,6 +2027,8 @@ __limProcessSmeJoinReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         psessionEntry->isFastRoamIniFeatureEnabled = pSmeJoinReq->isFastRoamIniFeatureEnabled;
 #endif
         psessionEntry->txLdpcIniFeatureEnabled = pSmeJoinReq->txLdpcIniFeatureEnabled;
+
+        lim_update_sae_config(psessionEntry, pSmeJoinReq);
 
         if (psessionEntry->bssType == eSIR_INFRASTRUCTURE_MODE)
         {
@@ -3866,7 +3893,7 @@ __limHandleSmeStopBssRequest(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
        )
     {
         tSirMacAddr   bcAddr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        if ((stopBssReq.reasonCode == eSIR_SME_MIC_COUNTER_MEASURES))
+        if (stopBssReq.reasonCode == eSIR_SME_MIC_COUNTER_MEASURES)
             // Send disassoc all stations associated thru TKIP
             __limCounterMeasures(pMac,psessionEntry);
         else
@@ -5809,7 +5836,7 @@ static void lim_process_sme_channel_change_request(tpAniSirGlobal mac_ctx,
    max_tx_pwr = cfgGetRegulatoryMaxTransmitPower(mac_ctx,
                      ch_change_req->new_chan);
 
-   if ((max_tx_pwr == WDA_MAX_TXPOWER_INVALID)) {
+   if (max_tx_pwr == WDA_MAX_TXPOWER_INVALID) {
        limLog(mac_ctx, LOGE, FL("Invalid Request/max_tx_pwr"));
        return;
    }
