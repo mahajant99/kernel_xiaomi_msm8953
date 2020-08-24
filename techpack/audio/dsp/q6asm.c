@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
  * Author: Brian Swetland <swetland@google.com>
  *
  * This software is licensed under the terms of the GNU General Public
@@ -44,7 +44,7 @@
 
 #define TRUE        0x01
 #define FALSE       0x00
-#define SESSION_MAX 8
+#define SESSION_MAX ASM_ACTIVE_STREAMS_ALLOWED
 
 enum {
 	ASM_TOPOLOGY_CAL = 0,
@@ -143,10 +143,10 @@ struct generic_get_data_ {
 };
 static struct generic_get_data_ *generic_get_data;
 
-#ifdef CONFIG_DEBUG_FS
 #define OUT_BUFFER_SIZE 56
 #define IN_BUFFER_SIZE 24
 
+#ifdef CONFIG_DEBUG_FS
 static struct timeval out_cold_tv;
 static struct timeval out_warm_tv;
 static struct timeval out_cont_tv;
@@ -160,6 +160,7 @@ static int in_cont_index;
 static int out_cold_index;
 static char *out_buffer;
 static char *in_buffer;
+#endif
 
 static uint32_t adsp_reg_event_opcode[] = {
 	ASM_STREAM_CMD_REGISTER_PP_EVENTS,
@@ -275,6 +276,7 @@ uint8_t q6asm_get_stream_id_from_token(uint32_t token)
 }
 EXPORT_SYMBOL(q6asm_get_stream_id_from_token);
 
+#ifdef CONFIG_DEBUG_FS
 static int audio_output_latency_dbgfs_open(struct inode *inode,
 							struct file *file)
 {
@@ -1450,7 +1452,7 @@ int q6asm_audio_client_buf_alloc(unsigned int dir,
 	pr_debug("%s: session[%d]bufsz[%d]bufcnt[%d]\n", __func__, ac->session,
 		bufsz, bufcnt);
 
-	if (ac->session <= 0 || ac->session > 8) {
+	if (ac->session <= 0 || ac->session > ASM_ACTIVE_STREAMS_ALLOWED) {
 		pr_err("%s: Session ID is invalid, session = %d\n", __func__,
 			ac->session);
 		goto fail;
@@ -1553,7 +1555,7 @@ int q6asm_audio_client_buf_alloc_contiguous(unsigned int dir,
 			__func__, ac->session,
 			bufsz, bufcnt);
 
-	if (ac->session <= 0 || ac->session > 8) {
+	if (ac->session <= 0 || ac->session > ASM_ACTIVE_STREAMS_ALLOWED) {
 		pr_err("%s: Session ID is invalid, session = %d\n", __func__,
 			ac->session);
 		goto fail;

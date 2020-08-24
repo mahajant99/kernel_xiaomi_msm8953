@@ -79,12 +79,7 @@ static const struct file_operations apr_debug_ops = {
 };
 #endif
 
-#define APR_PKT_INFO(x...) \
-do { \
-	if (apr_pkt_ctx) \
-		ipc_log_string(apr_pkt_ctx, "<APR>: "x); \
-} while (0)
-
+#define APR_PKT_INFO(x...) ((void)0)
 
 struct apr_svc_table {
 	char name[64];
@@ -1115,9 +1110,9 @@ static int __init apr_debug_init(void)
 }
 #else
 static int __init apr_debug_init(void)
-(
+{
 	return 0;
-)
+}
 #endif
 
 static void apr_cleanup(void)
